@@ -148,33 +148,20 @@ cc.Class({
 
         // 保存最高分到服务
 
-        let globalNode = cc.director.getScene().getChildByName('gameUser').getComponent('game_user_js');
-        let bestScore = globalNode.userGameInfo.fbBestScore || 0;
-        let db = wx.cloud.database();
-
-        if (this.score > bestScore) {
-            bestScore = this.score;
-            db.collection('userGameInfo').where({
-                _openid: globalNode.openid
-            }).get({
-                success: function(res) {
-                    db.collection('userGameInfo').doc(res.data[0]._id).update({
-                        data: {
-                            'fbBestScore': bestScore,
-                            'updateTime': db.serverDate()
-                        },
-                        success: function(sc) {
-                            globalNode.setUserGameInfo('fbBestScore', bestScore);
-                            console.log('保存成功')
-                        }
-                    })
-                }
-            })
-        };
+        //let globalNode = cc.director.getScene().getChildByName('gameUser').getComponent('game_user_js');
+        //let bestScore = globalNode.userGameInfo.fbBestScore || 0;
 
         // 显示当前分数、最高分
         currentScoreNode.getComponent(cc.Label).string = this.score;
-        bestScoreNode.getComponent(cc.Label).string = bestScore;
+        if(this.score>0){
+            //如果有分数,就向子域中发送分数
+            const openDataContext = wx.getOpenDataContext()
+            openDataContext.postMessage({
+                score: this.score,
+                year: (new Date()).getFullYear()
+            })
+        }  
+        //bestScoreNode.getComponent(cc.Label).string = bestScore;
 
         // 决定是否显示奖牌
         let showMedal = (err, spriteFrame) => {
@@ -232,7 +219,11 @@ cc.Class({
             this.bird.rise();
         }
     },
-
+    toOther(){
+        wx.navigateToMiniProgram({
+            appId: 'wx7feef145b72f629b',
+        })
+    },
     // 事件控制
     _enableInput(enable) {
         if (enable) {

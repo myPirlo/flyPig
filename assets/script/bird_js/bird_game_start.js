@@ -5,7 +5,9 @@ cc.Class({
         maskLayer: {
             default: null,
             type: cc.Node
-        }
+        },
+        menuGroup:cc.Node,
+        openData:cc.Node
     },
 
     startGame() {
@@ -22,7 +24,20 @@ cc.Class({
             )
         );
     },
-
+    showMenu(){
+        this.menuGroup.active=false
+        this.openData.active=true
+    },
+    hideMenu(){
+        this.menuGroup.active=true
+        this.openData.active=false
+    },
+    share(){
+        wx.shareAppMessage({
+            title: '不得了啦,这猪飞上天啦！！！',
+            imageUrl:'http://webfdh.com/way-hero/pig.jpg'
+        })
+    },
     // 返回游戏列表
     backGameList() {
         this.maskLayer.active = true;
